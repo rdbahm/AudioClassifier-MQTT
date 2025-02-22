@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#  Copyright (C) 2022 Sam Steele
+# Copyright 2022 Sam Steele, with modifications to support Mediapipe by Ryan Bahm
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -14,24 +14,23 @@
 #  limitations under the License.
 
 import time, sys, signal, logging, colorlog
-from tflite_support.task import audio
-from tflite_support.task import core
-from tflite_support.task import processor
+import numpy as np
+from mediapipe.tasks import python
+from mediapipe.tasks.python import audio
+from mediapipe.tasks.python.components import containers
 from config import *
 from mqtt import *
 
 def listen():
     logging.info("Loading TensorFlow model")
-    base_options = core.BaseOptions(file_name=TF_MODEL, num_threads=TF_NUM_THREADS)
-    classification_options = processor.ClassificationOptions(max_results=TF_MAX_RESULTS, score_threshold=TF_SCORE_THRESHOLD)
-    options = audio.AudioClassifierOptions(base_options=base_options, classification_options=classification_options)
+    base_options = python.BaseOptions(model_asset_path=TF_MODEL)
+    options = audio.AudioClassifierOptions(base_options=base_options, max_results=TF_MAX_RESULTS, score_threshold=TF_SCORE_THRESHOLD, category_allowlist=TF_INCLUDED_CATEGORIES)
     classifier = audio.AudioClassifier.create_from_options(options)
 
     logging.info("Creating audio recorder")
-    audio_record = classifier.create_audio_record()
-    tensor_audio = classifier.create_input_tensor_audio()
+    audio_record = classifier.create_audio_record(num_channels=1,sample_rate=16000,required_input_buffer_size=15600)
 
-    input_length_in_second = float(len(tensor_audio.buffer)) / tensor_audio.format.sample_rate
+    input_length_in_second = 15600/16000
     logging.debug("Recording sample length: %f", input_length_in_second)
 
     client = mqtt_init(audio_record)
@@ -43,8 +42,9 @@ def listen():
 
             if mqtt_listening_enabled():
                 logging.debug("Analyzing audio")
-                tensor_audio.load_from_audio_record(audio_record)
-                result = classifier.classify(tensor_audio)
+                audio_data = containers.AudioData.create_from_array(audio_record.read(15600),sample_rate=16000)
+                result = classifier.classify(audio_data)
+                result = result[0]
 
                 logging.debug("Got %i categories", len(result.classifications[0].categories))
                 if len(result.classifications[0].categories) > 0:
@@ -56,6 +56,8 @@ def listen():
                         else:
                             logging.info("Prediction: %s (%f)", category.category_name, category.score)
                             mqtt_publish_state(client, category.category_name, category.score)
+                else:
+                    mqtt_publish_state(client, "No Sound Detected", 0)
 
     finally:
         logging.info("Shutting down")

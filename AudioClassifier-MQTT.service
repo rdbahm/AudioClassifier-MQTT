@@ -1,6 +1,4 @@
-# syntax=docker/dockerfile:1
-
-# Copyright 2022 Sam Steele, with modifications to support Mediapipe by Ryan Bahm
+# Copyright 2025 Ryan Bahm
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.9-slim-buster
-WORKDIR /app
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install libusb-1.0 libportaudio2
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-COPY . .
-RUN pip3 install -r requirements.txt
-ENTRYPOINT [ "python3", "listen.py"]
+[Unit]
+Description=AudioClassifier-MQTT
+After=network.target
+
+[Service]
+Type=idle
+Restart=on-failure
+User=pi
+ExecStart=/bin/bash -c 'cd /home/pi/AudioClassifier-MQTT && /home/pi/audioclassifier-env/bin/python /home/pi/AudioClassifier-MQTT/listen.py'
+
+[Install]
+WantedBy=multi-user.target

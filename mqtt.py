@@ -1,4 +1,4 @@
-# Copyright 2022 Sam Steele
+# Copyright 2022 Sam Steele, with modifications to support Mediapipe by Ryan Bahm
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,11 @@ def mqtt_init(audio):
     audio_record = audio
     logging.info("Connecting to MQTT host %s:%i", MQTT_HOST, MQTT_PORT)
     client = mqtt.Client()
+
+    if(MQTT_TLS):
+        logging.info("Will use TLS for MQTT connection.")
+        client.tls_set()
+
     client.enable_logger(logging)
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
