@@ -28,9 +28,9 @@ def listen():
     classifier = audio.AudioClassifier.create_from_options(options)
 
     logging.info("Creating audio recorder")
-    audio_record = classifier.create_audio_record(num_channels=1,sample_rate=16000,required_input_buffer_size=15600)
+    audio_record = classifier.create_audio_record(num_channels=1,sample_rate=TF_MODEL_SAMPLE_RATE,required_input_buffer_size=TF_MODEL_BUFFER_SAMPLES)
 
-    input_length_in_second = 15600/16000
+    input_length_in_second = TF_MODEL_BUFFER_SAMPLES/TF_MODEL_SAMPLE_RATE
     logging.debug("Recording sample length: %f", input_length_in_second)
 
     client = mqtt_init(audio_record)
@@ -42,7 +42,7 @@ def listen():
 
             if mqtt_listening_enabled():
                 logging.debug("Analyzing audio")
-                audio_data = containers.AudioData.create_from_array(audio_record.read(15600),sample_rate=16000)
+                audio_data = containers.AudioData.create_from_array(audio_record.read(TF_MODEL_BUFFER_SAMPLES),sample_rate=TF_MODEL_SAMPLE_RATE)
                 result = classifier.classify(audio_data)
                 result = result[0]
 
