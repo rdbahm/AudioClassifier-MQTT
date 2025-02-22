@@ -20,7 +20,7 @@ After=network.target
 Type=idle
 Restart=on-failure
 User=pi
-ExecStart=/bin/bash -c 'cd /home/pi/AudioClassifier-MQTT && /home/pi/audioclassifier-env/bin/python /home/pi/AudioClassifier-MQTT/listen.py'
+ExecStart=/bin/bash -c 'cd /home/pi/AudioClassifier-MQTT && /home/pi/AudioClassifier-env/bin/python /home/pi/AudioClassifier-MQTT/listen.py'
 
 [Install]
 WantedBy=multi-user.target

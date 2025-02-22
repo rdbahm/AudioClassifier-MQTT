@@ -35,32 +35,52 @@ Copy `config.py.example` to `config.py` and set the following variables:
 Check your Python version and make sure version 3.9 or newer is installed on your system:
 
 ```shell
-python3 --version
+python --version
 ```
 
-Install required python3 modules:
+Clone the repo and install required Python modules into a venv:
 
 ```shell
-pip3 install -r requirements.txt
+python -m venv ~/AudioClassifier-env
+cd ~
+git clone https://github.com/rdbahm/AudioClassifier-MQTT.git
+cd AudioClassifier-MQTT
+~/AudioClassifier-env/bin/pip install -r requirements.txt
 ```
 
-On Linux, install the PortAudio library:
+On Linux, install the PortAudio library and libgl1 (used by MediaPipe):
 
 ```shell
-sudo apt-get update && apt-get install libportaudio2
+sudo apt-get update && sudo apt-get install libportaudio2 libgl1
 ```
 
 Run the `listen.py` script to start listening to the microphone and publishing the data to the MQTT server:
 
 ```shell
-python3 ./listen.py
+~/AudioClassifier-env/bin/python ./listen.py
 ```
 
 The sensor is now available in Home Assistant and can be used to trigger automations:
 
 ![Home Assistant Screenshot](images/home-assistant.png)
 
+## Running as a service on Linux
+
+If you would like to run this as a service on Linux, see the example systemd unit, AudioClassifier-MQTT.service. This sample code was configured for the "Pi" user on Raspian, but the setup requirements should be similar on other Linux distributions. You may need to adjust the paths and usernames to match your configuration. Once you're done editing:
+
+```shell
+sudo cp AudioClassifier-MQTT.service /lib/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable AudioClassifier-MQTT.service
+sudo systemctl start AudioClassifier-MQTT.service
+sudo systemctl status AudioClassifier-MQTT.service
+```
+
+The script should now run at boot.
+
 ## Docker
+
+NOTE: The Docker setup has not been tested since conversion to MediaPipe. Here there be dragons.
 
 To run this script as a Docker container, modify the `config.py` file as decribed above and then build the image:
 
@@ -73,6 +93,10 @@ Now create a container with access to the system's audio device (`/dev/dsp` is t
 ```shell
 docker run --name audioclassifier --restart=always -d --device /dev/dsp --network=host audioclassifier-mqtt
 ```
+
+## Troubleshooting
+* Having trouble getting anything to detect? Check your ALSA configuration. Exactly how to do this is beyond the scope of this document, but you'll need to ensure that your default recording device is set to the right source.
+* Make sure it's working when you execute it manually first, then 
 
 ## License
 
