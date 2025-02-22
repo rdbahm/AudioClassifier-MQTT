@@ -25,7 +25,7 @@ Copy `config.py.example` to `config.py` and set the following variables:
 * __TF_MAX_RESULTS__: TensorFlow maximum results
 * __TF_MODEL_SAMPLE_RATE__: The sample rate expected by the TensorFlow model. The default model expects 16000
 * __TF_MODEL_BUFFER_SAMPLES__: The sample rtae expected by the TensorFlow model. The default model is trained on 975ms, so 15600 samples
-* __TF_INCLUDED_CATEGORIES__: Categories to listen for - Consider keeping this as short as possible to reduce extraeous detections
+* __TF_INCLUDED_CATEGORIES__: Categories to listen for - Consider keeping this as short as possible to reduce extraeous detections. See the [list of categories](https://github.com/tensorflow/models/blob/master/research/audioset/yamnet/yamnet_class_map.csv) for the default model (yamnet).
 * __LOG_LEVEL__: Logging level
 * __LOG_FORMAT__: Logging format
 * __LOG_COLORS__: Logging level colors
