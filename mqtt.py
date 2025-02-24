@@ -94,7 +94,7 @@ def on_disconnect(client, userdata, rc):
     client.unsubscribe("homeassistant/switch/" + HA_SENSOR_UUID + "_enabled/config")
     if rc != 0:
         logging.error("Disconnected from MQTT server")
-        sys.exit(0)
+        sys.exit(1)
 
 def on_switch_set(client, userdata, message):
     logging.debug("Received message %s on topic %s QoS %i", message.payload, message.topic, message.qos)
