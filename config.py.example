@@ -28,6 +28,8 @@ HA_SENSOR_EXPIRE_AFTER = 10
 TF_MODEL = "model/yamnet.tflite"
 TF_SCORE_THRESHOLD = 0.8
 TF_MAX_RESULTS = 5
+TF_MODEL_SAMPLE_RATE = 16000
+TF_MODEL_BUFFER_SAMPLES = 15600
 TF_INCLUDED_CATEGORIES = ["Screaming","Children shouting","Yell","Shout","Child speech, kid speaking","Baby laughter","Baby cry, infant cry","Whimper","Wail, moan","Child singing"]
 
 LOG_LEVEL = logging.INFO
