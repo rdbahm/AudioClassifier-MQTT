@@ -1,5 +1,5 @@
 colorlog==6.6.0
-paho_mqtt
-mediapipe
-wheel
-numpy
+paho_mqtt==2.1.0
+mediapipe==0.10.18
+wheel==0.45.1
+numpy==1.26.4
